@@ -1,0 +1,14 @@
+Testing with: sgd relu
+Final result: 138/231
+[[138  92]
+ [  1   0]]
+
+Testing with: sgd sigmoid
+Final result: 158/231
+[[158  73]
+ [  0   0]]
+
+Testing with: <keras.src.optimizers.adam.Adam object at 0x0000016506541F90> relu
+Final result: 149/231
+[[141  65]
+ [ 17   8]]

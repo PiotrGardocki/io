@@ -5,12 +5,16 @@ import keras
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import itertools
 
 optimizers = [
-    keras.optimizers.Adam(learning_rate=0.001)
+    'sgd',
+    #keras.optimizers.Adam(learning_rate=0.0001),
+    keras.optimizers.Adam(learning_rate=0.001),
 ]
 activations = [
     'relu',
+    'sigmoid',
 ]
 
 print("Zadanie 4")
@@ -89,19 +93,6 @@ all_features = layers.concatenate(
     ]
 )
 
-x = layers.Dense(6, activation="relu")(all_features)
-x = layers.Dense(3, activation="relu")(x)
-output = layers.Dense(1, activation="sigmoid")(x)
-model = keras.Model(all_inputs, output)
-#model.compile("adam", "binary_crossentropy", metrics=["accuracy"])
-model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=0.0001),
-    loss='mean_absolute_error',
-    metrics=['mae'],
-)
-
-history = model.fit(train_ds, epochs=500, validation_data=test_ds)
-
 def round_array(array):
     return np.array([
         np.array([round(row[0])]) for row in array
@@ -119,13 +110,30 @@ def print_result(test_set, results):
     print(f"Final result: {correct}/{total}")
     print(confusion_matrix(results, test_set['class']))
 
-predicted_results = round_array(model.predict(test_ds))
-print_result(test_set, predicted_results)
+for opt, act in itertools.product(optimizers, activations):
+    x = layers.Dense(6, activation=act)(all_features)
+    x = layers.Dense(3, activation=act)(x)
+    output = layers.Dense(1, activation="sigmoid")(x)
+    model = keras.Model(all_inputs, output)
 
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('Model loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+    model.compile(
+        optimizer=opt,
+        loss='mean_absolute_error',
+        metrics=['mae'],
+    )
+
+    keras.utils.plot_model(model)
+
+    history = model.fit(train_ds, epochs=500, validation_data=test_ds)
+
+    predicted_results = round_array(model.predict(test_ds))
+    print("Testing with:", opt, act)
+    print_result(test_set, predicted_results)
+
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
