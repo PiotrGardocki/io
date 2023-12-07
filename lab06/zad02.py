@@ -9,9 +9,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import itertools
+from pathlib import Path
 
 
-FAST_RUN = True
+FAST_RUN = False
 IMAGE_WIDTH = 100
 IMAGE_HEIGHT = 100
 IMAGE_SIZE = (IMAGE_WIDTH, IMAGE_HEIGHT)
@@ -130,8 +131,14 @@ titles = [
 ]
 
 plots_dir = 'plots/'
+Path(plots_dir).mkdir(exist_ok=True)
+models_dir = 'models/'
+Path(models_dir).mkdir(exist_ok=True)
 
+i = 0
 for (model, optimizer), (title, file) in zip(itertools.product(models, optimizers), titles):
+    print(f"Training model number {i}: {title}")
+
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     earlystop = EarlyStopping(patience=10)
@@ -185,19 +192,19 @@ for (model, optimizer), (title, file) in zip(itertools.product(models, optimizer
         batch_size=batch_size
     )
 
-    test_gen = ImageDataGenerator(rescale=1./255)
-    test_generator = test_gen.flow_from_dataframe(
-        test_df,
-        directory,
-        x_col='filename',
-        y_col=None,
-        class_mode=None,
-        target_size=IMAGE_SIZE,
-        batch_size=batch_size,
-        shuffle=False
-    )
+    #test_gen = ImageDataGenerator(rescale=1./255)
+    #test_generator = test_gen.flow_from_dataframe(
+    #    test_df,
+    #    directory,
+    #    x_col='filename',
+    #    y_col=None,
+    #    class_mode=None,
+    #    target_size=IMAGE_SIZE,
+    #    batch_size=batch_size,
+    #    shuffle=False
+    #)
 
-    epochs = 1 if FAST_RUN else 50
+    epochs = 1 if FAST_RUN else 40
     history = model.fit(
         train_generator,
         epochs=epochs,
@@ -206,8 +213,6 @@ for (model, optimizer), (title, file) in zip(itertools.product(models, optimizer
         steps_per_epoch=total_train//batch_size,
         callbacks=callbacks
     )
-
-    print(history)
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
     ax1.plot(history.history['loss'], color='b', label="Training loss")
@@ -224,3 +229,7 @@ for (model, optimizer), (title, file) in zip(itertools.product(models, optimizer
     plt.tight_layout()
     plt.suptitle(title)
     plt.savefig(plots_dir + file + '.png')
+
+    model.save(models_dir + file + '.keras')
+
+    i += 1
