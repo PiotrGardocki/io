@@ -1,0 +1,21 @@
+Testing model number 1: relu + dropout, rmsprop optimizer
+Score: 6426/7500, 85.68%
+[[3002  750]
+ [ 324 3424]]
+
+Testing model number 2: relu + dropout, adam optimizer
+Score: 6639/7500, 88.52%
+[[3265  487]
+ [ 374 3374]]
+
+Testing model number 3: sigmoid + dropout, rmsprop optimizer
+Score: 6090/7500, 81.20%
+[[3281  471]
+ [ 939 2809]]
+
+Testing model number 1: relu + dropout, rmsprop optimizer
+Some incorrect guesses: ['cat.1900.jpg', 'cat.12263.jpg', 'cat.7408.jpg', 'cat.980.jpg', 'dog.8275.jpg', 'cat.1259.jpg', 'cat.3222.jpg', 'dog.1622.jpg', 'dog.7738.jpg', 'dog.3017.jpg']
+Testing model number 2: relu + dropout, adam optimizer
+Some incorrect guesses: ['cat.1900.jpg', 'dog.4708.jpg', 'cat.7408.jpg', 'cat.980.jpg', 'cat.1259.jpg', 'dog.1622.jpg', 'dog.7738.jpg', 'dog.3017.jpg', 'dog.12065.jpg', 'dog.10996.jpg']
+Testing model number 3: sigmoid + dropout, rmsprop optimizer
+Some incorrect guesses: ['dog.9112.jpg', 'cat.1900.jpg', 'cat.980.jpg', 'dog.8275.jpg', 'cat.1259.jpg', 'dog.9483.jpg', 'dog.10960.jpg', 'dog.9051.jpg', 'cat.10657.jpg', 'dog.7913.jpg']

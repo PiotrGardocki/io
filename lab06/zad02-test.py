@@ -1,16 +1,11 @@
-from keras.preprocessing.image import ImageDataGenerator, load_img
-from keras.utils import to_categorical
+from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, Activation, BatchNormalization
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import keras
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 import numpy as np
-import pandas as pd 
-import matplotlib.pyplot as plt
+import pandas as pd
 import os
-import itertools
-from pathlib import Path
 
 
 IMAGE_WIDTH = 100
@@ -46,16 +41,18 @@ titles = [
 
 models_dir = 'models/'
 
-i = 0
+i = 1
 for title, file in titles:
-    print(f"Testing model number {i}: {title}")
-
-    model: Sequential = keras.saving.load_model(models_dir + file + ".keras")
+    try:
+        model: Sequential = keras.saving.load_model(models_dir + file + ".keras")
+    except:
+        break
 
     df["category"] = df["category"].replace({0: 'cat', 1: 'dog'})
     _, test_df = train_test_split(df, test_size=0.30, random_state=42)
-    test_df = test_df.reset_index(drop=True)
+    test_df: pd.DataFrame = test_df.reset_index(drop=True)
 
+    print(f"Testing model number {i}: {title}")
     test_gen = ImageDataGenerator(rescale=1./255)
     test_generator = test_gen.flow_from_dataframe(
         test_df,
@@ -67,16 +64,23 @@ for title, file in titles:
         shuffle=False
     )
 
-    prediction = model.predict(test_generator)
+    prediction = model.predict(test_generator, verbose=0)
     test_df['predicted_cat'] = np.argmax(prediction, axis=-1)
+    test_df['predicted_cat'] = test_df['predicted_cat'].replace({1: 'dog', 0: 'cat'})
 
     count_all = 0
     count_correct = 0
+    incorrect_filenames = []
     for ind in test_df.index:
         count_all += 1
         if test_df['category'][ind] == test_df['predicted_cat'][ind]:
             count_correct += 1
+        else:
+            incorrect_filenames.append(test_df['filename'][ind])
 
-    print(f"Score: {count_correct}/{count_all}")
+    print(f"Some incorrect guesses: {incorrect_filenames[:10]}")
+
+    #print(f"Score: {count_correct}/{count_all}, {count_correct * 100 / count_all:.2f}%")
+    #print(confusion_matrix(test_df['category'], test_df['predicted_cat']))
 
     i += 1
