@@ -42,27 +42,30 @@ print(lemmatized_tokens)
 final_text = ' '.join(lemmatized_tokens)
 wordcloud = WordCloud().generate(final_text)
 
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
+#plt.imshow(wordcloud, interpolation='bilinear')
+#plt.axis("off")
 
 wordcloud = WordCloud(max_font_size=40).generate(final_text)
-plt.figure()
-plt.imshow(wordcloud, interpolation="bilinear")
-plt.axis("off")
-plt.show()
+#plt.figure()
+#plt.imshow(wordcloud, interpolation="bilinear")
+#plt.axis("off")
+#plt.show()
 
 words = sorted(list(set(lemmatized_tokens)))
 count = [(word, final_text.count(word)) for word in words]
 count.sort(key=lambda t: t[1], reverse=True)
 print(count)
+count = count[2:20]
 
 df = pd.DataFrame({
-    t[0]: t[1] for t in count
+    #t[0]: t[1] for t in count
+    'words': [t[0] for t in count],
+    'count': [t[1] for t in count],
 })
 
-plt.figure(figsize=(15,10))
-df.plot.bar()
-plt.xticks(rotation=50)
-plt.xlabel("Country of Origin")
-plt.ylabel("Number of Wines")
+print(df)
+
+df.plot.bar(x='words')
+plt.xticks(rotation=90)
+
 plt.show()
